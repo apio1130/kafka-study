@@ -1,5 +1,6 @@
 package com.fastcampus.chap1clip1;
 
+import org.apache.kafka.clients.admin.AdminClient;
 import org.apache.kafka.clients.admin.NewTopic;
 import org.apache.kafka.common.config.TopicConfig;
 import org.springframework.context.annotation.Bean;
@@ -9,6 +10,11 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class KafkaTopicConfiguration {
+
+    @Bean
+    public AdminClient adminClient(KafkaAdmin kafkaAdmin) {
+        return AdminClient.create(kafkaAdmin.getConfigurationProperties());
+    }
 
     @Bean
     public NewTopic clip2() {
