@@ -22,6 +22,7 @@ public class Chap1Clip1Application {
             clipProducer.sync("clip3", "Hello, Clip3-sync");
             clipProducer.routingSend("clip3", "Hello, Clip3-routing");
             clipProducer.routingSendBytes("clip3-bytes", "Hello, Clip3-bytes".getBytes(StandardCharsets.UTF_8));
+            clipProducer.replyingSend("clip3-request", "Ping Clip3");
         };
     }
 

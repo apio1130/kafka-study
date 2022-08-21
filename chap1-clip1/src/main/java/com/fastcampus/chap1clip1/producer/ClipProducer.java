@@ -1,10 +1,13 @@
 package com.fastcampus.chap1clip1.producer;
 
+import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.springframework.kafka.core.KafkaProducerException;
 import org.springframework.kafka.core.KafkaSendCallback;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.core.RoutingKafkaTemplate;
+import org.springframework.kafka.requestreply.ReplyingKafkaTemplate;
+import org.springframework.kafka.requestreply.RequestReplyFuture;
 import org.springframework.kafka.support.SendResult;
 import org.springframework.stereotype.Component;
 import org.springframework.util.concurrent.ListenableFuture;
@@ -20,9 +23,12 @@ public class ClipProducer {
 
     private final RoutingKafkaTemplate routingKafkaTemplate;
 
-    public ClipProducer(KafkaTemplate<String, String> kafkaTemplate, RoutingKafkaTemplate routingKafkaTemplate) {
+    private final ReplyingKafkaTemplate replyingKafkaTemplate;
+
+    public ClipProducer(KafkaTemplate<String, String> kafkaTemplate, RoutingKafkaTemplate routingKafkaTemplate, ReplyingKafkaTemplate replyingKafkaTemplate) {
         this.kafkaTemplate = kafkaTemplate;
         this.routingKafkaTemplate = routingKafkaTemplate;
+        this.replyingKafkaTemplate = replyingKafkaTemplate;
     }
 
     public void async(String topic, String message) {
@@ -62,6 +68,14 @@ public class ClipProducer {
 
     public void routingSendBytes(String topic, byte... message) {
         routingKafkaTemplate.send(topic, message);
+    }
+
+    public void replyingSend(String topic, String message) throws ExecutionException, InterruptedException, TimeoutException {
+        ProducerRecord<String, String> record = new ProducerRecord<>(topic, message);
+        RequestReplyFuture<String, String, String> replyFuture = replyingKafkaTemplate.sendAndReceive(record);
+
+        ConsumerRecord<String, String> consumerRecord = replyFuture.get(10, TimeUnit.SECONDS);
+        System.out.println(consumerRecord.value());
     }
 
 }
