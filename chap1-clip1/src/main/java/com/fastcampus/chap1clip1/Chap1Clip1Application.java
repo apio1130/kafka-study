@@ -1,5 +1,6 @@
 package com.fastcampus.chap1clip1;
 
+import com.fastcampus.chap1clip1.producer.ClipProducer;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -14,9 +15,10 @@ public class Chap1Clip1Application {
     }
 
     @Bean
-    public ApplicationRunner runner(KafkaTemplate<String, String> kafkaTemplate) {
+    public ApplicationRunner runner(ClipProducer clipProducer) {
         return args -> {
-            kafkaTemplate.send("clip3", "Hello, Clip3");
+            clipProducer.async("clip3", "Hello, Clip3-async");
+            Thread.sleep(1000L);
         };
     }
 
