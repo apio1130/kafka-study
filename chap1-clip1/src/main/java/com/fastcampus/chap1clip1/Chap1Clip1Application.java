@@ -5,8 +5,7 @@ import org.springframework.boot.ApplicationRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
-
-import java.nio.charset.StandardCharsets;
+import org.springframework.kafka.listener.KafkaMessageListenerContainer;
 
 @SpringBootApplication
 public class Chap1Clip1Application {
@@ -16,13 +15,26 @@ public class Chap1Clip1Application {
     }
 
     @Bean
-    public ApplicationRunner runner(ClipProducer clipProducer) {
+    public ApplicationRunner runner(ClipProducer clipProducer,
+                                    KafkaMessageListenerContainer<String, String> kafkaMessageListenerContainer) {
         return args -> {
-            clipProducer.async("clip3", "Hello, Clip3-async");
-            clipProducer.sync("clip3", "Hello, Clip3-sync");
-            clipProducer.routingSend("clip3", "Hello, Clip3-routing");
-            clipProducer.routingSendBytes("clip3-bytes", "Hello, Clip3-bytes".getBytes(StandardCharsets.UTF_8));
-            clipProducer.replyingSend("clip3-request", "Ping Clip3");
+            clipProducer.async("clip4", "Hello, Clip4 Container.");
+
+            kafkaMessageListenerContainer.start();
+            Thread.sleep(1_000L);
+
+            System.out.println("--- pause ---");
+            kafkaMessageListenerContainer.pause();
+            Thread.sleep(5_000L);
+
+            clipProducer.async("clip4", "Hello, Secondly Clip4 Container.");
+
+            System.out.println("--- resume ---");
+            kafkaMessageListenerContainer.resume();
+            Thread.sleep(1_000L);
+
+            System.out.println("--- stop ---");
+            kafkaMessageListenerContainer.stop();
         };
     }
 
