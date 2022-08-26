@@ -1,13 +1,13 @@
 package com.fastcampus.chap1clip1.consumer;
 
-import org.apache.kafka.clients.consumer.internals.ConsumerMetadata;
+import com.fastcampus.chap1clip1.model.Animal;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.listener.adapter.ConsumerRecordMetadata;
 import org.springframework.kafka.support.KafkaHeaders;
 import org.springframework.messaging.handler.annotation.Header;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
+import javax.validation.Valid;
 import java.util.Date;
 
 @Service
@@ -23,5 +23,10 @@ public class ClipConsumer {
                 ", partition=" + partition +
                 ", timestamp=" + new Date(timestamp) +
                 ", message=" + message);
+    }
+
+    @KafkaListener(id = "clip4-animal-listener", topics = "clip4-animal", containerFactory = "kafkaJsonContainerFactory")
+    public void listenAnimal(@Valid Animal animal) {
+        System.out.println("animal = " + animal);
     }
 }
