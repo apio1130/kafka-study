@@ -17,6 +17,8 @@ public class Chap3Clip1Application {
     public ApplicationRunner runner(KafkaManager kafkaManager) {
         return args -> {
             kafkaManager.describeTopicConfigs();
+            kafkaManager.changeConfig();
+            kafkaManager.describeTopicConfigs();
         };
     }
 
