@@ -58,5 +58,14 @@ public class KafkaManager {
 
     }
 
+    public void findAllConsumerGroups() throws ExecutionException, InterruptedException {
+        ListConsumerGroupsResult result = adminClient.listConsumerGroups();
+        Collection<ConsumerGroupListing> groups = result.valid().get();
+
+        for (ConsumerGroupListing group : groups) {
+            System.out.println(group);
+        }
+    }
+
 
 }
