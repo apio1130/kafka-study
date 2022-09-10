@@ -1,18 +1,14 @@
 package com.fastcampus.chap3clip1.service;
 
-import org.apache.kafka.clients.admin.AdminClient;
-import org.apache.kafka.clients.admin.AlterConfigOp;
-import org.apache.kafka.clients.admin.ConfigEntry;
-import org.apache.kafka.clients.admin.DescribeConfigsResult;
+import org.apache.kafka.clients.admin.*;
+import org.apache.kafka.common.KafkaFuture;
+import org.apache.kafka.common.TopicPartition;
 import org.apache.kafka.common.config.ConfigResource;
 import org.apache.kafka.common.config.TopicConfig;
 import org.springframework.kafka.core.KafkaAdmin;
 import org.springframework.stereotype.Service;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ExecutionException;
 
 @Service
@@ -44,6 +40,22 @@ public class KafkaManager {
         ops.put(resource, List.of(new AlterConfigOp(new ConfigEntry(TopicConfig.RETENTION_MS_CONFIG, null), AlterConfigOp.OpType.DELETE))); // 초기화
 
         adminClient.incrementalAlterConfigs(ops);
+    }
+
+    public void deleteRecords() throws ExecutionException, InterruptedException {
+        // 레코드 삭제
+        TopicPartition tp = new TopicPartition("clip4-listener", 0);
+        Map<TopicPartition, RecordsToDelete> target = new HashMap<>();
+        target.put(tp, RecordsToDelete.beforeOffset(1));
+
+        DeleteRecordsResult deleteRecordsResult = adminClient.deleteRecords(target);
+        Map<TopicPartition, KafkaFuture<DeletedRecords>> result = deleteRecordsResult.lowWatermarks();
+
+        Set<Map.Entry<TopicPartition, KafkaFuture<DeletedRecords>>> entries = result.entrySet();
+        for (Map.Entry<TopicPartition, KafkaFuture<DeletedRecords>> entry : entries) {
+            System.out.println("topic=" + entry.getKey().topic() + ", partition " + entry.getKey().partition() + ", " + entry.getValue().get().lowWatermark());
+        }
+
     }
 
 

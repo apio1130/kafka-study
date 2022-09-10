@@ -16,9 +16,10 @@ public class Chap3Clip1Application {
     @Bean
     public ApplicationRunner runner(KafkaManager kafkaManager) {
         return args -> {
-            kafkaManager.describeTopicConfigs();
-            kafkaManager.changeConfig();
-            kafkaManager.describeTopicConfigs();
+//            kafkaManager.describeTopicConfigs();
+//            kafkaManager.changeConfig();
+//            kafkaManager.describeTopicConfigs();
+            kafkaManager.deleteRecords();
         };
     }
 
