@@ -2,6 +2,6 @@ management:
   endpoints:
     web:
       exposure:
-        include: "*"
+        include: "metrics, prometheus"
 server:
   port: 8180
