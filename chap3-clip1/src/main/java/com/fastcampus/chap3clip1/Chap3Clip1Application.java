@@ -21,6 +21,15 @@ public class Chap3Clip1Application {
 //            kafkaManager.describeTopicConfigs();
 //            kafkaManager.deleteRecords();
             kafkaManager.findAllConsumerGroups();
+            try {
+                kafkaManager.deleteConsumerGroup();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+            Thread.sleep(2_000L);
+            System.out.println("---- after delete consumer group ----");
+            kafkaManager.findAllConsumerGroups();
         };
     }
 
