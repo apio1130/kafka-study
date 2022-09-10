@@ -17,19 +17,11 @@ public class Chap3Clip1Application {
     public ApplicationRunner runner(KafkaManager kafkaManager) {
         return args -> {
             kafkaManager.describeTopicConfigs();
-//            kafkaManager.changeConfig();
-//            kafkaManager.describeTopicConfigs();
-//            kafkaManager.deleteRecords();
-            kafkaManager.findAllConsumerGroups();
-            try {
-                kafkaManager.deleteConsumerGroup();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+            kafkaManager.changeConfig();
+            kafkaManager.describeTopicConfigs();
 
-            Thread.sleep(2_000L);
-            System.out.println("---- after delete consumer group ----");
             kafkaManager.findAllConsumerGroups();
+            kafkaManager.findAllOffsets();
         };
     }
 

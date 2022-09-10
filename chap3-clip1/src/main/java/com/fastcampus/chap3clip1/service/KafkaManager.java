@@ -72,5 +72,16 @@ public class KafkaManager {
         adminClient.deleteConsumerGroups(List.of("clip1-id", "clip4-animal-listener")).all().get();
     }
 
+    public void findAllOffsets() throws ExecutionException, InterruptedException {
+        // 오프셋 확인
+        Map<TopicPartition, OffsetSpec> target = new HashMap<>();
+        target.put(new TopicPartition("clip4-listener", 0), OffsetSpec.latest());
+
+        ListOffsetsResult result = adminClient.listOffsets(target);
+        for (TopicPartition tp : target.keySet()) {
+            System.out.println("topic=" + tp.topic() + ", partition=" + tp.partition() + ", offsets=" + result.partitionResult(tp).get());
+         }
+    }
+
 
 }
