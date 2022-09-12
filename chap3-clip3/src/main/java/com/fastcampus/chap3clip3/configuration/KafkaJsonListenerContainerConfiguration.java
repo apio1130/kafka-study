@@ -12,7 +12,12 @@ import org.springframework.kafka.config.KafkaListenerEndpointRegistrar;
 import org.springframework.kafka.core.ConsumerFactory;
 import org.springframework.kafka.core.DefaultKafkaConsumerFactory;
 import org.springframework.kafka.listener.ConcurrentMessageListenerContainer;
+import org.springframework.kafka.listener.ListenerExecutionFailedException;
 import org.springframework.kafka.support.serializer.JsonDeserializer;
+import org.springframework.retry.RetryPolicy;
+import org.springframework.retry.policy.SimpleRetryPolicy;
+import org.springframework.retry.support.RetryTemplate;
+import org.springframework.retry.support.RetryTemplateBuilder;
 import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
 
 import java.util.HashMap;
@@ -31,8 +36,23 @@ public class KafkaJsonListenerContainerConfiguration implements KafkaListenerCon
     public KafkaListenerContainerFactory<ConcurrentMessageListenerContainer<String, Animal>> kafkaJsonContainerFactory() {
         ConcurrentKafkaListenerContainerFactory<String, Animal> factory = new ConcurrentKafkaListenerContainerFactory<>();
         factory.setConsumerFactory(animalConsumerFactory());
+        factory.setRetryTemplate(customizeRetryTemplate());
 
         return factory;
+    }
+
+    private RetryTemplate customizeRetryTemplate() {
+        return new RetryTemplateBuilder()
+                .fixedBackoff(1_000)
+                .customPolicy(retryPolicy())
+                .build();
+    }
+
+    private RetryPolicy retryPolicy() {
+        Map<Class<? extends Throwable>, Boolean> exceptions = new HashMap<>();
+        exceptions.put(ListenerExecutionFailedException.class, true);
+
+        return new SimpleRetryPolicy(3, exceptions);
     }
 
     private ConsumerFactory<String, Animal> animalConsumerFactory() {
