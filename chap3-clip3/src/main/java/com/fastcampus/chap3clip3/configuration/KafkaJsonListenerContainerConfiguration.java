@@ -42,8 +42,10 @@ public class KafkaJsonListenerContainerConfiguration implements KafkaListenerCon
         factory.setRecoveryCallback(context -> {
             ConsumerRecord record = (ConsumerRecord) context.getAttribute("record");
             System.out.println("Recovery callback. message=" + record.value());
-            return Optional.empty();
+//            return Optional.empty();
+            throw new RuntimeException("RuntiemException");
         });
+        factory.setErrorHandler((thrownException, data) -> System.out.println("Error handler. exception=" + thrownException.getMessage()));
 
         return factory;
     }
