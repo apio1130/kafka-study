@@ -2,6 +2,7 @@ package com.fastcampus.chap3clip3.configuration;
 
 import com.fastcampus.chap3clip3.model.Animal;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
+import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -22,6 +23,7 @@ import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 @Configuration
 public class KafkaJsonListenerContainerConfiguration implements KafkaListenerConfigurer {
@@ -37,6 +39,11 @@ public class KafkaJsonListenerContainerConfiguration implements KafkaListenerCon
         ConcurrentKafkaListenerContainerFactory<String, Animal> factory = new ConcurrentKafkaListenerContainerFactory<>();
         factory.setConsumerFactory(animalConsumerFactory());
         factory.setRetryTemplate(customizeRetryTemplate());
+        factory.setRecoveryCallback(context -> {
+            ConsumerRecord record = (ConsumerRecord) context.getAttribute("record");
+            System.out.println("Recovery callback. message=" + record.value());
+            return Optional.empty();
+        });
 
         return factory;
     }
