@@ -21,9 +21,14 @@ public class ClipStreamsConfiguration {
     @Bean
     public KStream<String, String> kStream(StreamsBuilder streamsBuilder) {
         KStream<String, String> stream = streamsBuilder.stream("clip4");
-        stream.peek((key, value) -> System.out.println("Stream. message=" + value))
-                .map((key, value) -> KeyValue.pair(key, "Hello, Listener")) // 메시지 변형
-                .to("clip4-to"); // 다른 토픽으로 전달
+//        stream.peek((key, value) -> System.out.println("Stream. message=" + value))
+//                .map((key, value) -> KeyValue.pair(key, "Hello, Listener")) // 메시지 변형
+//                .to("clip4-to"); // 다른 토픽으로 전달
+        stream.groupBy((key, value) -> value)
+                .count()
+                .toStream()
+                .peek((key, value) -> System.out.println("key=" + key + ", value=" + value))
+        ;
 
         return stream;
     }
