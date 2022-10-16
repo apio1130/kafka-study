@@ -29,6 +29,9 @@ public class ClipStreamsConfiguration {
         configs.put(StreamsConfig.APPLICATION_ID_CONFIG, "clip4-streams-id");
         configs.put(StreamsConfig.DEFAULT_KEY_SERDE_CLASS_CONFIG, Serdes.String().getClass());
         configs.put(StreamsConfig.DEFAULT_VALUE_SERDE_CLASS_CONFIG, Serdes.String().getClass());
+//        configs.put(StreamsConfig.NUM_STREAM_THREADS_CONFIG, "2");  // 여러 쓰레드에서 실행하기 위한 설정
+//        configs.put(StreamsConfig.PROCESSING_GUARANTEE_CONFIG, StreamsConfig.AT_LEAST_ONCE);    // 적어도 한번 처리
+        configs.put(StreamsConfig.PROCESSING_GUARANTEE_CONFIG, StreamsConfig.EXACTLY_ONCE_V2);  // 단 한번만 메시지 처리
 
         return new KafkaStreamsConfiguration(configs);
     }
