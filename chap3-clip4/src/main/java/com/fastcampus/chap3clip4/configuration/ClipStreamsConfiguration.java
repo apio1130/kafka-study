@@ -1,6 +1,7 @@
 package com.fastcampus.chap3clip4.configuration;
 
 import org.apache.kafka.common.serialization.Serdes;
+import org.apache.kafka.streams.KeyValue;
 import org.apache.kafka.streams.StreamsBuilder;
 import org.apache.kafka.streams.StreamsConfig;
 import org.apache.kafka.streams.kstream.KStream;
@@ -19,7 +20,12 @@ public class ClipStreamsConfiguration {
 
     @Bean
     public KStream<String, String> kStream(StreamsBuilder streamsBuilder) {
-        return streamsBuilder.stream("clip4");
+        KStream<String, String> stream = streamsBuilder.stream("clip4");
+        stream.peek((key, value) -> System.out.println("Stream. message=" + value))
+                .map((key, value) -> KeyValue.pair(key, "Hello, Listener")) // 메시지 변형
+                .to("clip4-to"); // 다른 토픽으로 전달
+
+        return stream;
     }
 
     @Bean(name = KafkaStreamsDefaultConfiguration.DEFAULT_STREAMS_CONFIG_BEAN_NAME)
