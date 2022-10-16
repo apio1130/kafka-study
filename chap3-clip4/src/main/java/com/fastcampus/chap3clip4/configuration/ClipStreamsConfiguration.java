@@ -24,11 +24,19 @@ public class ClipStreamsConfiguration {
 //        stream.peek((key, value) -> System.out.println("Stream. message=" + value))
 //                .map((key, value) -> KeyValue.pair(key, "Hello, Listener")) // 메시지 변형
 //                .to("clip4-to"); // 다른 토픽으로 전달
-        stream.groupBy((key, value) -> value)
-                .count()
-                .toStream()
-                .peek((key, value) -> System.out.println("key=" + key + ", value=" + value))
-        ;
+
+//        stream.groupBy((key, value) -> value)
+//                .count()
+//                .toStream()
+//                .peek((key, value) -> System.out.println("key=" + key + ", value=" + value));
+
+        KStream<String, String>[] branches = stream.branch(
+                (key, value) -> Long.valueOf(value) % 10 == 0,
+                (key, value) -> true
+        );
+
+        branches[0].peek((key, value) -> System.out.println("Branch 0. message=" + value));
+        branches[1].peek((key, value) -> System.out.println("Branch 1. message=" + value));
 
         return stream;
     }
